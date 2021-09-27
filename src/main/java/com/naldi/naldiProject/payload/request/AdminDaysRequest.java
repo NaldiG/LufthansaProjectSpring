@@ -3,6 +3,8 @@ package com.naldi.naldiProject.payload.request;
 import javax.validation.constraints.NotBlank;
 
 public class AdminDaysRequest {
+    private Long userId;
+
     private Integer requestId;
 
     private Integer daysRequested;
@@ -52,5 +54,13 @@ public class AdminDaysRequest {
 
     public void setRequestId(Integer requestId) {
         this.requestId = requestId;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 }

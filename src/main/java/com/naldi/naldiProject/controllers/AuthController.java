@@ -144,12 +144,12 @@ public class AuthController {
 			}else{
 				return ResponseEntity
 						.badRequest()
-						.body(new MessageResponse("Error: Email does not exist!"));
+						.body(new MessageResponse("Error: Email not correct!"));
 			}
 		}else{
 			return ResponseEntity
 					.badRequest()
-					.body(new MessageResponse("Error: Username does not exist!"));
+					.body(new MessageResponse("Error: Username not correct!"));
 		}
 	}
 }

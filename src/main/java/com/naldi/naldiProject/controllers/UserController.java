@@ -32,8 +32,8 @@ import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
-@RequestMapping("/api/test")
-public class TestController {
+@RequestMapping("/api/user")
+public class UserController {
 
 	@Autowired
 	UserRepository userRepository;
@@ -53,18 +53,6 @@ public class TestController {
 	@GetMapping("/all")
 	public String allAccess() {
 		return "No new announcements!";
-	}
-
-	@GetMapping("/mod")
-	@PreAuthorize("hasRole('MODERATOR')")
-	public String moderatorAccess() {
-		return "Moderator not yet implemented.";
-	}
-
-	@GetMapping("/admin")
-	@PreAuthorize("hasRole('ADMIN')")
-	public String adminAccess() {
-		return "Admin not yet implemented.";
 	}
 
 	@PostMapping("/update")
@@ -131,45 +119,6 @@ public class TestController {
 
 		return ResponseEntity.ok(new DaysResponse(request.getId(), request.getDaysRequested(), request.getReason(),
 				request.getStatus(),request.getResponse(), "Request submitted"));
-	}
-
-	@PostMapping("/response")
-	@PreAuthorize("hasRole('MODERATOR') or hasRole('ADMIN')")
-	public ResponseEntity<?> adminDayResponse(@Valid @RequestBody AdminDaysRequest daysRequest) {
-
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		UserDetailsImpl userDetails;
-		if (!(authentication instanceof AnonymousAuthenticationToken)) {
-			userDetails = (UserDetailsImpl) authentication.getPrincipal();
-		}else{
-			return ResponseEntity.ok(new MessageResponse("User not found!" + authentication.getPrincipal()));
-		}
-
-		if(daysRequest.getDaysRequested() > daysRequest.getDaysLeft()){
-			return ResponseEntity.ok(new MessageResponse("Not enough free days left!" + authentication.getPrincipal()));
-		}
-
-		User user = userRepository.findById(userDetails.getId()).get();
-		Request request = daysRepository.findById(daysRequest.getRequestId()).get();
-		user.setDays(user.getDays() - daysRequest.getDaysRequested());
-		userRepository.save(user);
-		request.setResponse(daysRequest.getResponse());
-
-		String strStatus = daysRequest.getStatus();
-		EStatus status;
-
-		if(strStatus.equals("STATUS_PENDING")){
-			status = EStatus.STATUS_PENDING;
-		}else if(strStatus.equals("STATUS_ACCEPTED")){
-			status = EStatus.STATUS_ACCEPTED;
-		}else{
-			status = EStatus.STATUS_DENIED;
-		}
-
-		request.setStatus(status);
-		daysRepository.save(request);
-		return ResponseEntity.ok(new DaysResponse(request.getId(), request.getDaysRequested(), request.getReason(),
-				request.getStatus(),request.getResponse(), "Request processed"));
 	}
 
 	@GetMapping("/allUserRequests")
